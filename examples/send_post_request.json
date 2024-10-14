@@ -1,0 +1,12 @@
+{
+  "name": "Example Request 1",
+  "method": "GET",
+  "body": {
+    "key1": "value1",
+    "key2": "value2"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "url": "https://kkogaatest24.free.beeceptor.com"
+}
