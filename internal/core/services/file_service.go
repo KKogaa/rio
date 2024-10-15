@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/KKogaa/rio/internal/core/entities"
+	"github.com/tidwall/pretty"
 )
 
-type FileService struct {
-}
+type FileService struct{}
 
 func NewFileService() *FileService {
 	return &FileService{}
@@ -34,4 +35,37 @@ func (f *FileService) GetRequestFromFile(filepath string) (entities.Request, err
 	}
 
 	return request, nil
+}
+
+func (f *FileService) CreateRequestFile(filename, name, method, url string) (string, error) {
+	filename = filepath.Clean(filename)
+	if filepath.Ext(filename) == "" {
+		filename += ".json"
+	}
+	req := entities.Request{
+		Name:    name,
+		Method:  method,
+		Body:    map[string]interface{}{},
+		Headers: map[string]string{},
+		Url:     url,
+	}
+
+	file, err := os.Create(filename)
+	defer file.Close()
+	if err != nil {
+		return filename, err
+	}
+
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return filename, err
+	}
+
+	prettyJsonData := pretty.Pretty(jsonData)
+	_, err = file.Write(prettyJsonData)
+	if err != nil {
+		return filename, err
+	}
+
+	return file.Name(), nil
 }
