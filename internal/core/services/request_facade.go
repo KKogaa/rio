@@ -1,8 +1,6 @@
 package services
 
 import (
-	"log"
-
 	"github.com/KKogaa/rio/internal/core/entities"
 )
 
@@ -28,14 +26,11 @@ func (r *RequestFacade) Send(filepath string) (entities.Request, entities.Respon
 	// TODO: future handle chaining requests
 	request, err := r.fileService.GetRequestFromFile(filepath)
 	if err != nil {
-		log.Println("entro 1")
 		return entities.Request{}, entities.Response{}, err
 	}
-	log.Println(request)
 
 	response, err := r.requestService.MakeRequest(request)
 	if err != nil {
-		log.Println("entro 2")
 		return entities.Request{}, entities.Response{}, err
 	}
 

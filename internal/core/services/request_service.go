@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 
@@ -24,22 +26,41 @@ func (r *RequestService) MakeRequest(request entities.Request) (entities.Respons
 		return entities.Response{}, err
 	}
 
+	for key, value := range request.Headers {
+		req.Header.Set(key, value)
+	}
+
+	jsonBody, err := json.Marshal(request.Body)
+	if err != nil {
+		return entities.Response{}, err
+	}
+
+	req.Body = io.NopCloser(bytes.NewReader(jsonBody))
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return entities.Response{}, err
 	}
 
-	if resp.Request.Body == nil {
+	if resp.Body == nil {
 		return entities.Response{StatusCode: resp.StatusCode}, nil
 	}
 
-	defer resp.Request.Body.Close()
-	body, err := io.ReadAll(resp.Request.Body)
-	if err != nil {
-		return entities.Response{}, err
+	defer resp.Body.Close()
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return entities.Response{}, err
+	// }
+
+	var responseBody map[string]interface{}
+	if resp.Body != nil {
+		decoder := json.NewDecoder(resp.Body)
+		err := decoder.Decode(&responseBody)
+		if err != nil {
+			return entities.Response{}, err 
+		}
 	}
 
-	//TODO: fix this entity, parse it to a map
-	return entities.Response{Body: string(body),
+	return entities.Response{Body: responseBody,
 		StatusCode: resp.StatusCode}, nil
 }

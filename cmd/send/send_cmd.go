@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/KKogaa/rio/internal/core/services"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/tidwall/pretty"
 )
@@ -15,8 +16,8 @@ var SendCmd = &cobra.Command{
 	Short: "Sends an http request based on file structure",
 	Run: func(cmd *cobra.Command, args []string) {
 		//TODO: add the uber dependency injection
-		log.Println("executing send command")
-		log.Println("args", args)
+		// log.Println("executing send command")
+		// log.Println("args", args)
 		fileService := services.NewFileService()
 		requestService := services.NewRequestService()
 		requestFacade := services.NewRequestFacade(fileService, requestService)
@@ -26,8 +27,10 @@ var SendCmd = &cobra.Command{
 			log.Println("error", err)
 		}
 
-    fmt.Println("Request:")
+    green := color.New(color.FgGreen)
+    fmt.Println(green.Sprint("Request:"))
 		PrettyPrintStruct(request)
+    fmt.Println(green.Sprint("Response:"))
 		PrettyPrintStruct(response)
 	},
 }
@@ -37,6 +40,6 @@ func PrettyPrintStruct[T any](data T) {
 	if err != nil {
 		log.Println("error marshalling data: ", err)
 	}
-  prettyJsonData := pretty.Pretty(jsonData)
+	prettyJsonData := pretty.Pretty(jsonData)
 	fmt.Println(string(pretty.Color(prettyJsonData, nil)))
 }
