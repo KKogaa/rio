@@ -30,6 +30,9 @@ var SendCmd = &cobra.Command{
 		if requestName != "" {
 			request, response, err = requestFacade.Send(requestName)
 		} else {
+			if len(args) == 0 {
+				log.Fatal("No request name or file path provided")
+			}
 			request, response, err = requestFacade.SendByPath(args[0])
 		}
 
