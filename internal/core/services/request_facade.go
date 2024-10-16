@@ -18,13 +18,12 @@ func NewRequestFacade(fileService *FileService,
 	}
 }
 
-func (r *RequestFacade) Send(filepath string) (entities.Request, entities.Response, error) {
-	// obtain the current file directory and file the file definition
-	// if not find the file definition based on the file path
-	// make the spec have an alias
-
-	// TODO: future handle chaining requests
-	request, err := r.fileService.GetRequestFromFile(filepath)
+// obtain the current file directory and file the file definition
+// if not find the file definition based on the file path
+// make the spec have an alias
+// TODO: future handle chaining requests
+func (r *RequestFacade) Send(filename string) (entities.Request, entities.Response, error) {
+	request, err := r.fileService.SearchForSpec(filename)
 	if err != nil {
 		return entities.Request{}, entities.Response{}, err
 	}
@@ -37,7 +36,16 @@ func (r *RequestFacade) Send(filepath string) (entities.Request, entities.Respon
 	return request, response, nil
 }
 
-// func (r *RequestFacade) List(directoryPath string) {
-//   // get the list of all the json files in the directory and list their names
-//
-// }
+func (r *RequestFacade) SendByPath(filepath string) (entities.Request, entities.Response, error) {
+	request, err := r.fileService.GetRequestFromFile(filepath)
+	if err != nil {
+		return entities.Request{}, entities.Response{}, err
+	}
+
+	response, err := r.requestService.MakeRequest(request)
+	if err != nil {
+		return entities.Request{}, entities.Response{}, err
+	}
+
+	return request, response, nil
+}

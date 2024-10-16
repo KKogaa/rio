@@ -1,9 +1,11 @@
 package create
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/KKogaa/rio/internal/core/services"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +25,18 @@ var CreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println("File created at: ", name)
+		green := color.New(color.FgGreen)
+		fmt.Println(green.Sprint("File created at: "), name)
 	},
 }
 
 func init() {
-	CreateCmd.Flags().StringVarP(&file, "output", "o", "sample.json", "File path to output the request")
-	CreateCmd.Flags().StringVarP(&requestName, "requestName", "r", "TestRequest", "Brief description of the request")
-	CreateCmd.Flags().StringVarP(&method, "method", "m", "GET", "HTTP Method of the request")
-	CreateCmd.Flags().StringVarP(&url, "url", "u", "http://localhost:8080", "URL to send the HTTP request")
+	CreateCmd.Flags().StringVarP(&file, "output", "o", "sample.json",
+		"File path to output the request")
+	CreateCmd.Flags().StringVarP(&requestName, "requestName", "r", "TestRequest",
+		"Brief description of the request")
+	CreateCmd.Flags().StringVarP(&method, "method", "m", "GET",
+		"HTTP Method of the request")
+	CreateCmd.Flags().StringVarP(&url, "url", "u", "http://localhost:8080",
+		"URL to send the HTTP request")
 }

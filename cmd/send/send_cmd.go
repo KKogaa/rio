@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/KKogaa/rio/internal/core/entities"
 	"github.com/KKogaa/rio/internal/core/services"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -13,26 +14,45 @@ import (
 
 var SendCmd = &cobra.Command{
 	Use:   "send",
-	Short: "Sends an http request based on file structure",
+	Short: "sends an http request based on a rio spec",
 	Run: func(cmd *cobra.Command, args []string) {
-		//TODO: add the uber dependency injection
-		// log.Println("executing send command")
-		// log.Println("args", args)
-		fileService := services.NewFileService()
-		requestService := services.NewRequestService()
-		requestFacade := services.NewRequestFacade(fileService, requestService)
 
-		request, response, err := requestFacade.Send(args[0])
-		if err != nil {
-			log.Println("error", err)
+		verbose, _ := cmd.Flags().GetBool("verbose")
+		requestName, _ := cmd.Flags().GetString("name")
+
+		requestFacade := services.NewRequestFacade(services.NewFileService(),
+			services.NewRequestService())
+
+		var request entities.Request
+		var response entities.Response
+		var err error
+
+		if requestName != "" {
+			request, response, err = requestFacade.Send(requestName)
+		} else {
+			request, response, err = requestFacade.SendByPath(args[0])
 		}
 
-    green := color.New(color.FgGreen)
-    fmt.Println(green.Sprint("Request:"))
-		PrettyPrintStruct(request)
-    fmt.Println(green.Sprint("Response:"))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		green := color.New(color.FgGreen)
+
+		if verbose {
+			fmt.Println(green.Sprint("Request:"))
+			PrettyPrintStruct(request)
+			fmt.Println(green.Sprint("Response:"))
+		}
 		PrettyPrintStruct(response)
 	},
+}
+
+func init() {
+	SendCmd.Flags().BoolP("verbose", "v", false,
+		"Show verbose output")
+	SendCmd.Flags().StringP("name", "n", "",
+		"Execute a request by name")
 }
 
 func PrettyPrintStruct[T any](data T) {

@@ -1,6 +1,6 @@
 {
-  "name": "post-request",
-  "method": "POST",
+  "name": "Example Request 1",
+  "method": "GET",
   "body": {
     "key1": "value1",
     "key2": "value2"

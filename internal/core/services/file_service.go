@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -37,7 +38,8 @@ func (f *FileService) GetRequestFromFile(filepath string) (entities.Request, err
 	return request, nil
 }
 
-func (f *FileService) CreateRequestFile(filename, name, method, url string) (string, error) {
+func (f *FileService) CreateRequestFile(filename string, name string,
+	method string, url string) (string, error) {
 	filename = filepath.Clean(filename)
 	if filepath.Ext(filename) == "" {
 		filename += ".json"
@@ -68,4 +70,25 @@ func (f *FileService) CreateRequestFile(filename, name, method, url string) (str
 	}
 
 	return file.Name(), nil
+}
+
+func (f *FileService) SearchForSpec(name string) (entities.Request, error) {
+	// iterate overt the current working directory and find all the json files
+	files, err := os.ReadDir(".")
+	if err != nil {
+		return entities.Request{}, err
+	}
+
+	for _, file := range files {
+		if filepath.Ext(file.Name()) != ".json" {
+			continue
+		}
+
+		request, err := f.GetRequestFromFile(file.Name())
+		if err == nil && request.Name == name {
+			return request, nil
+		}
+	}
+
+	return entities.Request{}, errors.New("request name not found")
 }
