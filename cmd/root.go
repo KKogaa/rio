@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/KKogaa/rio/cmd/create"
+	"github.com/KKogaa/rio/cmd/list"
 	"github.com/KKogaa/rio/cmd/send"
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(send.SendCmd)
 	rootCmd.AddCommand(create.CreateCmd)
+	rootCmd.AddCommand(list.ListCmd)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("there was an error executing the cli: %s", err)
 	}
