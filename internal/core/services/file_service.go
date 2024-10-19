@@ -72,6 +72,32 @@ func (f *FileService) CreateRequestFile(filename string, name string,
 	return file.Name(), nil
 }
 
+func (f *FileService) SearchCwd() ([]entities.Spec, error) {
+	files, err := os.ReadDir(".")
+	if err != nil {
+		return []entities.Spec{}, err
+	}
+
+	list := []entities.Spec{}
+	for _, file := range files {
+		filename := file.Name()
+		if filepath.Ext(filename) != ".json" {
+			continue
+		}
+
+		request, err := f.GetRequestFromFile(filename)
+		if err != nil {
+			return list, err
+		}
+		newSpec, err := entities.CreateSpec(request, filename)
+		if err != nil {
+			return list, err
+		}
+		list = append(list, newSpec)
+	}
+	return list, err
+}
+
 func (f *FileService) SearchForSpec(name string) (entities.Request, error) {
 	// iterate overt the current working directory and find all the json files
 	files, err := os.ReadDir(".")
